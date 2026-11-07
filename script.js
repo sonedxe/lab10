@@ -13,34 +13,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    mensaje.style.color = "red";
+    limpiarMensaje();
 
     const emailValor = correo.value.trim();
     const passValor = password.value;
 
-    if (emailValor === "") {
-      mensaje.textContent = "El correo no puede estar vacío.";
-      return;
-    }
+    if (!validarCorreo(emailValor)) return;
+    if (!validarPassword(passValor)) return;
 
-    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValor);
-    if (!emailValido) {
-      mensaje.textContent = "Ingrese un correo con formato válido.";
-      return;
-    }
-
-    if (passValor.length < 8) {
-      mensaje.textContent = "La contraseña debe tener al menos 8 caracteres.";
-      return;
-    }
-
-    // Demostración didáctica (sin autenticación real)
-    mensaje.style.color = "green";
-    mensaje.textContent = "Datos válidos (demostración).";
+    // Demostración didáctica (sin autenticación real, sin guardar datos)
+    mostrarExito("Datos válidos (demostración).");
 
     // Usuario demo de la sesión 03
     if (emailValor === "demo@ejemplo.com" && passValor === "password123") {
-      mensaje.textContent = "Bienvenido (usuario demo).";
+      mostrarExito("Bienvenido (usuario demo).");
     }
   });
+
+  // Limpia el error cuando el usuario vuelve a escribir
+  correo.addEventListener("input", limpiarMensaje);
+  password.addEventListener("input", limpiarMensaje);
+
+  function validarCorreo(valor) {
+    if (valor === "") {
+      mostrarError("El correo no puede estar vacío.", correo);
+      return false;
+    }
+    const formatoOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valor);
+    if (!formatoOk) {
+      mostrarError("Ingrese un correo con formato válido (ej. usuario@ejemplo.com).", correo);
+      return false;
+    }
+    return true;
+  }
+
+  function validarPassword(valor) {
+    if (valor === "") {
+      mostrarError("La contraseña no puede estar vacía.", password);
+      return false;
+    }
+    if (valor.length < 8) {
+      mostrarError("La contraseña debe tener al menos 8 caracteres.", password);
+      return false;
+    }
+    return true;
+  }
+
+  function mostrarError(texto, campo) {
+    mensaje.style.color = "#b91c1c";
+    mensaje.textContent = texto;
+    if (campo) campo.focus();
+  }
+
+  function mostrarExito(texto) {
+    mensaje.style.color = "green";
+    mensaje.textContent = texto;
+  }
+
+  function limpiarMensaje() {
+    mensaje.textContent = "";
+  }
 });
